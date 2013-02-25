@@ -59,7 +59,8 @@ if (!$api->isLoggedIn() && !$api->login()) {
 			print_r($coupon);
 		}
 	}
-}```
+}
+```
 
 ## Notes
 
