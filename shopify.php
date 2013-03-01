@@ -4,18 +4,20 @@ namespace Shopify;
 
 class PrivateAPI {
 	const _LOGIN_URL = 'auth/login';
-
+	const _REPORT_CENTER = 'https://reportcenter.shopify.com/';
+	
 	const _COOKIE_STORE = '/tmp/shopify_cookie.txt';
 	const _USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_3) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.57 Safari/537.17';
 	
-	protected $ch = null;
-	protected $ci = null;
+	protected $ch = null,
+			  $ci = null;
 	
 	private $inputs = false,
 			$username = false,
 			$password = false,
 			$store = false,
-			$token = false;
+			$_token = false,
+			$_dashboardToken = false;
 			
 	public function __construct($user, $pass, $store) {	
 		if (!filter_var($store, FILTER_VALIDATE_URL))
@@ -24,7 +26,6 @@ class PrivateAPI {
 		$this->store = $store . (substr($store, -1) == '/' ? '' : '/');
 		$this->username = $user;
 		$this->password = $pass;
-
 	}
 	
 	public function __destruct() {
@@ -36,6 +37,10 @@ class PrivateAPI {
 		return !is_array($this->getFields());
 	}
 
+	public function dashboardToken() {
+		return $this->_dashboardToken;
+	}
+	
 	public function login() {
 		$fields = $this->inputs ?: $this->getFields();
 
@@ -60,9 +65,17 @@ class PrivateAPI {
 	
 	public function doRequest($method, $function, $parameters) {
 		$this->ch = curl_init();		
-
-		$url = $this->store . $function;
-
+		$reportCenter = false;
+		
+		if (isset($parameters['reportcenter'])) {
+			$url = self::_REPORT_CENTER . $function;
+			$reportCenter = true;
+			$parameters['callback'] = 'fake_function';
+			unset($parameters['reportcenter']);
+		} else {
+			$url = (!filter_var($function, FILTER_VALIDATE_URL) ? $this->store : '') . $function;
+		}
+		
 		switch ($method) {
 			case 'POST':
 				$this->setOpts([
@@ -71,7 +84,7 @@ class PrivateAPI {
 					CURLOPT_URL => $url,
 					CURLOPT_HTTPHEADER => [
 						'X-Shopify-Api-Features: pagination-headers',
-						'X-CSRF-Token: ' . $this->token,
+						'X-CSRF-Token: ' . $this->_token,
 						'X-Requested-With: XMLHttpRequest',
 						'Content-Type: application/json',
 						'Accept: application/json'
@@ -92,16 +105,31 @@ class PrivateAPI {
 		if (curl_errno($this->ch))
 			throw new \Exception('Shopify Private API exception: ' . curl_error($this->ch));
 		
-		return json_decode($response);
+		if ($reportCenter) {
+			if (strpos($response, 'fake_function') !== FALSE) {
+				$response = substr($response, strpos($response, '{'));
+				$response = substr($response, 0, -2);
+			}
+		}
+
+		$data = json_decode($response);
+		
+		return is_object($data) ? $data : $response;
 	}
 
 	public function setToken($input) {
 		$data = filter_var($input, FILTER_VALIDATE_URL) ? $this->initGetData($input) : $input;
 		
 		if (preg_match('/<meta content="(.*)" name="csrf-token" \/>/i', $data, $token)) {
-			$this->token = $token[1];
+			$this->_token = $token[1];
+			
+			if (preg_match('/Shopify.set\(\'controllers.dashboard.token\', "(.*)"\)/i', $data, $dashboardToken)) {
+				$this->_dashboardToken = $dashboardToken[1];
+			}
+			
  			return true;
 		}
+		
 		
 		throw new \Exception('Failed to set token');
 	}
@@ -110,7 +138,6 @@ class PrivateAPI {
 		if (!filter_var($url, FILTER_VALIDATE_URL))
 			throw new \Exception('Invalid URL: ' . $url);
 		
-
 		$this->ch = curl_init($url);
 		$this->setOpts($opts);
 		
@@ -123,7 +150,6 @@ class PrivateAPI {
 	}
 	
 	private function setOpts($extra = []) {	
-		
 		$default = [
 			CURLOPT_USERAGENT => self::_USER_AGENT,
 			CURLOPT_COOKIEJAR => self::_COOKIE_STORE,
