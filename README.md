@@ -61,7 +61,6 @@ if (!$api->isLoggedIn() && !$api->login()) {
 	
 	$params = [
 		'reportcenter' => true,
-		'token' => $api->dashboardToken(),
 		'start_date' => '2013-02-22',
 		'end_date' => '2013-03-01',
 		'timezone' => 'Pacific+Time+(US+%26+Canada)'

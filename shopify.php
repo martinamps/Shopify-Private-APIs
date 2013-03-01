@@ -71,6 +71,7 @@ class PrivateAPI {
 			$url = self::_REPORT_CENTER . $function;
 			$reportCenter = true;
 			$parameters['callback'] = 'fake_function';
+			$parameters['token'] = $this->dashboardToken();
 			unset($parameters['reportcenter']);
 		} else {
 			$url = (!filter_var($function, FILTER_VALIDATE_URL) ? $this->store : '') . $function;
