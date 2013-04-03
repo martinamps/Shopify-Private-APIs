@@ -19,7 +19,9 @@ class PrivateAPI {
 			$_token = false,
 			$_dashboardToken = false;
 			
-	public function __construct($user, $pass, $store) {	
+	public function __construct($user, $pass, $store) {
+		if (!preg_match('/\:\/\//', $store))
+			$store = 'https://' . $store;
 		if (!filter_var($store, FILTER_VALIDATE_URL))
 			throw new \Exception('Invalid store URL');
 		
