@@ -53,6 +53,10 @@ class PrivateAPI {
 		$fields['login']  = $this->username;
 		$fields['password'] = $this->password;
 
+		if (isset($fields['_method'])) {
+			unset($fields['_method']);
+		}
+
 		$url = $this->store . self::_LOGIN_URL;
 
 		$this->ch = curl_init($url);
