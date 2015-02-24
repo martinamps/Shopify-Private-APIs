@@ -29,7 +29,7 @@ if (!$api->isLoggedIn() && !$api->login()) {
 	# Create a 5% discount coupon
 	$new_discount = ['discount' => [
 		'applies_to_id' => '',
-		'code' => 'automatic_coupon'
+		'code' => 'automatic_coupon',
 		'discount_type' => 'percentage',
 		'value' => 5,
 		'usage_limit' => 1,
