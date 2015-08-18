@@ -132,7 +132,7 @@ class PrivateAPI {
 	public function setToken($input) {
 		$data = filter_var($input, FILTER_VALIDATE_URL) ? $this->initGetData($input) : $input;
 
-		if (preg_match('/<meta content="(.*)" name="csrf-token" \/>/i', $data, $token)) {
+		if (preg_match('/<meta name="csrf-token" content="(.*)" \/>/i', $data, $token)) {
 			$this->_token = $token[1];
 
 			if (preg_match('/Shopify.set\(\'controllers.dashboard.token\', "(.*)"\)/i', $data, $dashboardToken)) {
