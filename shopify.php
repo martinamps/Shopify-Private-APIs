@@ -104,7 +104,7 @@ class PrivateAPI {
 
 				break;
 			case 'DELETE':
-				$this->setopts([
+				$this->setOpts([
 					CURLOPT_CUSTOMREQUEST => 'DELETE',
 					CURLOPT_URL => $url
 				]);
