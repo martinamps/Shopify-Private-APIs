@@ -7,7 +7,7 @@ class PrivateAPI {
 	const _REPORT_CENTER = 'https://reportcenter.shopify.com/';
 	
 	const _COOKIE_STORE = '/tmp/shopify_cookie.txt';
-	const _USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_3) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.57 Safari/537.17';
+	const _USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36';
 	
 	protected $ch = null,
 		  $ci = null;
