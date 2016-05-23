@@ -5,9 +5,10 @@ namespace Shopify;
 class PrivateAPI {
 	const _LOGIN_URL = 'auth/login';
 	const _REPORT_CENTER = 'https://reportcenter.shopify.com/';
+    const _BROWSER_BYPASS_URL = 'unsupported_browser_bypass';
 	
 	const _COOKIE_STORE = '/tmp/shopify_cookie.txt';
-	const _USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_3) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.57 Safari/537.17';
+	const _USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36';
 	
 	protected $ch = null,
 		  $ci = null;
@@ -69,9 +70,27 @@ class PrivateAPI {
 
 		$data = curl_exec($this->ch);
 		$http_code = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
+        $data = $this->browserBypass($data);
 
 		return ($http_code == 200 && $this->setToken($data));
 	}
+
+    public function browserBypass($data) {
+        if (strpos($data, self::_BROWSER_BYPASS_URL) === false) {
+            return $data;
+        }
+
+        $url = $this->store . self::_BROWSER_BYPASS_URL;
+        $this->ch = curl_init($url);
+        $this->setOpts();
+        $data = curl_exec($this->ch);
+
+		$http_code = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
+        if ($http_code != 200) {
+			throw new \Exception("GET [$url] got $http_code response -- details from cURL: " . curl_error($this->ch));
+        }
+
+        return $data;
 
 	public function doRequest($method, $function, $parameters) {
 		$this->ch = curl_init();		
