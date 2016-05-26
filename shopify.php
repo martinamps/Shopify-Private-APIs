@@ -75,7 +75,7 @@ class PrivateAPI {
 		return ($http_code == 200 && $this->setToken($data));
 	}
 
-    public function browserBypass($data) {
+	public function browserBypass($data) {
 		if (strpos($data, self::_BROWSER_BYPASS_URL) === false) {
 			return $data;
 		}
