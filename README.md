@@ -6,6 +6,7 @@
 
 Faced with the need of automatically generating coupon codes I turned to the Shopify public API. Unfortunately, no such functionality existed. I figured the ones used by their admin panel were just undocumented, however the typical API credentials weren't accepted. This wrapper enables this use of such API's.
 
+If you'd like to read more about how and why this works, see https://ma.rtin.so/reverse-engineering-shopify-private-apis
 ## Requirements
 
 * PHP 5.4+
